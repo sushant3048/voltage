@@ -26,8 +26,8 @@ cv2.imshow("orig", img);
 kernel = np.ones((5,5), np.uint8);
 
 # threshold params
-low = 165;
-high = 200;
+low = 120;
+high = 255;
 iters = 3;
 
 # make copy
