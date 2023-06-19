@@ -20,7 +20,7 @@ contours, _ = cv.findContours(mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
 
 # Find the contour with the largest area
 if len(contours) > 0:
-    max_contour = max(contours, key=cv2.contourArea)
+    max_contour = max(contours, key=cv.contourArea)
     x, y, w, h = cv.boundingRect(max_contour)
     
 

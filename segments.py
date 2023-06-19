@@ -9,19 +9,19 @@ def readseg(slice):
     # canvas.fill(255)
 
     # Convert to gray
-    disp=slice.copy()
+    # disp=slice.copy()
     gray = cv.cvtColor(slice, cv.COLOR_BGR2GRAY)
     # Convert to BW
-    (th, bw) = cv.threshold(gray, 100, 255, cv.THRESH_OTSU)
+    (th, bw) = cv.threshold(gray, 100, 255, cv.THRESH_BINARY)
 
-    kernel = np.ones((5, 5), np.uint8)
-    eroded = cv.erode(bw, kernel, iterations=2)
-    # cv.imshow('Eroded', eroded)
+    kernel = np.ones((4, 4), np.uint8)
+    eroded = cv.erode(bw, kernel, iterations=1)
+    cv.imshow('Eroded', eroded)
 
     inverted = ~eroded
     contours, hierarchy = cv.findContours(
         inverted,  cv.RETR_TREE,  cv.CHAIN_APPROX_SIMPLE)
-    with_contours = cv.drawContours(slice, contours, -1,(0,255,255),1)
+    slice = cv.drawContours(slice, contours, -1,(0,255,255),1)
     
     max_contour=max(contours, key=cv.contourArea)
     x,y,w,h=cv.boundingRect(max_contour)
@@ -34,11 +34,11 @@ def readseg(slice):
         w=3*w
 
 
-    cv.rectangle(with_contours,(x,y),(x+w,y+h),(0,0,255),1)
-    cv.imshow('Detected contours', with_contours)
+    cv.rectangle(slice,(x,y),(x+w,y+h),(0,0,255),1)
+    cv.imshow('Detected contours', slice)
 
     cropped=crop(eroded,[(x,y),[x+w,y+h]])
-    disp=crop(disp,[(x,y),[x+w,y+h]])
+    # disp=crop(disp,[(x,y),[x+w,y+h]])
 
 
     # Digit detection ////////////////////////
@@ -75,10 +75,10 @@ def readseg(slice):
         count = np.count_nonzero(part==0);
         area=wd*ht
         # print('count, area, coverage',count,area, round(count/area*100))
-        if count / area > 0.5: # 0.5 is a sensitivity measure
+        if count / area > 0.6: # 0.5 is a sensitivity measure
             flags.append(a);
         cv.rectangle(cropped, (x,y), (x+wd, y+ht), (0, 0,255), 1)
-    cv.imshow('letter',eroded)
+    cv.imshow('letter',cropped)
 
     if flags == [0,2,3,4,5,6]:
         return '0';
@@ -100,6 +100,6 @@ def readseg(slice):
         return '8';
     if flags == [0,1,2,3,5,6]:
             return '9';
-    return '#';
+    return flags;
 
 
