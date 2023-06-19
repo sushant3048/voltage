@@ -4,19 +4,20 @@ import pytesseract as pyt
 from Util import crop
 
 
-def readseg(orig, rec):
-    seg = crop(orig, rec)
-
+def readseg(seg):
     # Convert to gray
     gray = cv.cvtColor(seg, cv.COLOR_BGR2GRAY)
     # Convert to BW
     (th, bw) = cv.threshold(gray, 100, 255, cv.THRESH_OTSU)
-    cv.imshow('bw', bw)
-    ibw = ~bw
-    cv.imshow('ibw', ibw)
+
+    kernel = np.ones((5, 5), np.uint8)
+    eroded = cv.erode(bw, kernel, iterations=2)
+    cv.imshow('Eroded', eroded)
+
+    inverted = ~eroded
     contours, hierarchy = cv.findContours(
-        ibw,  cv.RETR_TREE,  cv.CHAIN_APPROX_SIMPLE)
-    with_contours = cv.drawContours(seg, contours, -1,(0,255,255),1)
+        eroded,  cv.RETR_TREE,  cv.CHAIN_APPROX_SIMPLE)
+    with_contours = cv.drawContours(seg, contours, 1,(0,255,255),1)
     cv.imshow('Detected contours', with_contours)
     
 

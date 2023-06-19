@@ -58,11 +58,12 @@ cv.rectangle(inp, *r3, (0, 255, 0), 2)
 
 cv.imshow('inp',inp)
 
-d1=readseg(inp,r1)
+
 # # idenfity the digit
-# i1 = crop(dup, r1)
-# i2 = crop(dup, r2)
-# i3 = crop(dup, r3)
+seg1 = crop(inp, r1)
+seg2 = crop(inp, r2)
+seg3 = crop(inp, r3)
+d1=readseg(seg2)
 
 cv.waitKey(0)
 cv.destroyAllWindows()
