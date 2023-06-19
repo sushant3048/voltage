@@ -1,6 +1,6 @@
 import cv2 as cv
 import numpy as np
-import pytesseract as pyt
+# import pytesseract as pyt
 from Util import crop
 
 
@@ -8,7 +8,6 @@ def readseg(slice):
     # canvas = np.zeros([1024,512,3],dtype=np.uint8)
     # canvas.fill(255)
 
-    print('slice',slice.shape)
     # Convert to gray
     disp=slice.copy()
     gray = cv.cvtColor(slice, cv.COLOR_BGR2GRAY)
@@ -26,6 +25,15 @@ def readseg(slice):
     
     max_contour=max(contours, key=cv.contourArea)
     x,y,w,h=cv.boundingRect(max_contour)
+    # print('rec',x,y,w,h)
+    # special case of 1
+    # rec 8 12 105 207
+    # rec 82 26 36 186
+    if w/h<0.5:
+        x=int(x-2*w)
+        w=3*w
+
+
     cv.rectangle(with_contours,(x,y),(x+w,y+h),(0,0,255),1)
     cv.imshow('Detected contours', with_contours)
 
@@ -64,40 +72,34 @@ def readseg(slice):
 
         # check
         part=crop(cropped, [(x,y),(x+wd,y+ht)])
-        print('--------------')
-        print(a)
-        print('---------------')
-        print(part)
-        print('part sixe',part.shape)
         count = np.count_nonzero(part==0);
         area=wd*ht
-        print('count, area, coverage',count,area, round(count/area*100))
-        if count / area > 0.1: # 0.5 is a sensitivity measure
+        # print('count, area, coverage',count,area, round(count/area*100))
+        if count / area > 0.5: # 0.5 is a sensitivity measure
             flags.append(a);
         cv.rectangle(cropped, (x,y), (x+wd, y+ht), (0, 0,255), 1)
-    print('disp',disp.shape)
     cv.imshow('letter',eroded)
-    # # print(flags)
-    # if flags == [0,2,3,4,5,6]:
-    #     return 0;
-    # if flags == [5,6]:
-    #     return 1;
-    # if flags == [0,1,2,4,5]:
-    #     return 2;
-    # if flags == [0,1,2,5,6]:
-    #     return 3;
-    # if flags == [1,3,5,6]:
-    #     return 4;
-    # if flags == [0,1,2,3,6]:
-    #     return 5;
-    # if flags == [0,1,2,3,4,6]:
-    #     return 6;
-    # if flags == [0,5,6]:
-    #     return 7;
-    # if flags == [0,1,2,3,4,5,6]:
-    #     return 8;
-    # if flags == [0,1,2,3,5,6]:
-    #         return 9;
-    # return -1;
 
-    # return 0
+    if flags == [0,2,3,4,5,6]:
+        return '0';
+    if flags == [5,6]:
+        return '1';
+    if flags == [0,1,2,4,5]:
+        return '2';
+    if flags == [0,1,2,5,6]:
+        return '3';
+    if flags == [1,3,5,6]:
+        return '4';
+    if flags == [0,1,2,3,6]:
+        return '5';
+    if flags == [0,1,2,3,4,6]:
+        return '6';
+    if flags == [0,5,6]:
+        return '7';
+    if flags == [0,1,2,3,4,5,6]:
+        return '8';
+    if flags == [0,1,2,3,5,6]:
+            return '9';
+    return '#';
+
+
