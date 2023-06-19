@@ -19,66 +19,60 @@ mask = cv.inRange(hsv, lower_blue, upper_blue)
 contours, _ = cv.findContours(mask, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
 
 # Find the contour with the largest area
-max_area = 0
-max_contour = None
-for contour in contours:
-    area = cv.contourArea(contour)
-    if area > max_area:
-        max_area = area
-        max_contour = contour
+if len(contours) > 0:
+    max_contour = max(contours, key=cv2.contourArea)
+    x, y, w, h = cv.boundingRect(max_contour)
 
-x, y, w, h = cv.boundingRect(max_contour)
+    # tightening the rectangle with experimental values
+    x = int(x+w*0.07)
+    w = int(w*0.85)
+    y = int(y+h*0.05)
+    h = int(h*0.90)
 
-# tightening the rectangle with experimental values
-x = int(x+w*0.07)
-w = int(w*0.85)
-y = int(y+h*0.05)
-h = int(h*0.90)
+    cropped = crop(inp,[(x,y),(x+w,y+h)])
 
-cropped = crop(inp,[(x,y),(x+w,y+h)])
-
-# setting refrences in respect of cropped image
-# x=0
-# y=0
-# slicing into 3 parts for each digit.
-wd = int(w/3)
-x1 = x+wd
-x2 = x1+wd
+    # setting refrences in respect of cropped image
+    # x=0
+    # y=0
+    # slicing into 3 parts for each digit.
+    wd = int(w/3)
+    x1 = x+wd
+    x2 = x1+wd
 
 
-# cords of each digit
-r1 = [(x, y), (x1, y+h)]
-r2 = [(x1, y), (x2, y+h)]
-r3 = [(x2, y), (x+w, y+h)]
+    # cords of each digit
+    r1 = [(x, y), (x1, y+h)]
+    r2 = [(x1, y), (x2, y+h)]
+    r3 = [(x2, y), (x+w, y+h)]
 
-disp=cropped.copy()
-cv.rectangle(inp, *r1, (0, 255, 0), 2)
-cv.rectangle(inp, *r2, (0, 255, 0), 2)
-cv.rectangle(inp, *r3, (0, 255, 0), 2)
+    disp=cropped.copy()
+    cv.rectangle(inp, *r1, (0, 255, 255), 2)
+    cv.rectangle(inp, *r2, (0, 255, 255), 2)
+    cv.rectangle(inp, *r3, (0, 255, 255), 2)
 
-cv.imshow('inp',inp)
-
-
-# # idenfity the digit
-seg1 = crop(inp, r1)
-seg2 = crop(inp, r2)
-seg3 = crop(inp, r3)
-d1=readseg(seg2)
-
-cv.waitKey(0)
-cv.destroyAllWindows()
-
-# gray = cv.cvtColor(inp, cv.COLOR_BGR2GRAY)
-# (th, frame) = cv.threshold(gray, 100, 255, cv.THRESH_BINARY)
-# black_mask = np.zeros(frame.shape,np.uint8)
-# white_mask=cv.bitwise_not(black_mask)
-# white_mask[y:y+h,x:x+w] = frame[y:y+h,x:x+w]
-# frame=white_mask
+    cv.imshow('inp',inp)
 
 
-# t = pyt.image_to_string(frame, config='--psm 13')
-# t = pyt.image_to_string(frame, config='--psm 7 -c tessedit_char_whitelist=0123456789')
-# print('>>'+t)
+    # # idenfity the digit
+    seg1 = crop(inp, r1)
+    seg2 = crop(inp, r2)
+    seg3 = crop(inp, r3)
+    d1=readseg(seg1)
+
+    cv.waitKey(0)
+    cv.destroyAllWindows()
+
+    # gray = cv.cvtColor(inp, cv.COLOR_BGR2GRAY)
+    # (th, frame) = cv.threshold(gray, 100, 255, cv.THRESH_BINARY)
+    # black_mask = np.zeros(frame.shape,np.uint8)
+    # white_mask=cv.bitwise_not(black_mask)
+    # white_mask[y:y+h,x:x+w] = frame[y:y+h,x:x+w]
+    # frame=white_mask
+
+
+    # t = pyt.image_to_string(frame, config='--psm 13')
+    # t = pyt.image_to_string(frame, config='--psm 7 -c tessedit_char_whitelist=0123456789')
+    # print('>>'+t)
 
 
 
