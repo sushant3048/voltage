@@ -5,6 +5,10 @@ from Util import crop
 
 
 def readseg(slice):
+    # canvas = np.zeros([1024,512,3],dtype=np.uint8)
+    # canvas.fill(255)
+
+    print('slice',slice.shape)
     # Convert to gray
     disp=slice.copy()
     gray = cv.cvtColor(slice, cv.COLOR_BGR2GRAY)
@@ -17,29 +21,32 @@ def readseg(slice):
 
     inverted = ~eroded
     contours, hierarchy = cv.findContours(
-        eroded,  cv.RETR_TREE,  cv.CHAIN_APPROX_SIMPLE)
-    with_contours = cv.drawContours(slice, contours, 1,(0,255,255),1)
-    # cv.imshow('Detected contours', with_contours)
+        inverted,  cv.RETR_TREE,  cv.CHAIN_APPROX_SIMPLE)
+    with_contours = cv.drawContours(slice, contours, -1,(0,255,255),1)
+    
     max_contour=max(contours, key=cv.contourArea)
     x,y,w,h=cv.boundingRect(max_contour)
+    cv.rectangle(with_contours,(x,y),(x+w,y+h),(0,0,255),1)
+    cv.imshow('Detected contours', with_contours)
+
     cropped=crop(eroded,[(x,y),[x+w,y+h]])
     disp=crop(disp,[(x,y),[x+w,y+h]])
-    # disp = cv.cvtColor(disp, cv.COLOR_GRAY2BGR)
-    
+
 
     # Digit detection ////////////////////////
-    th=0.1
-    tv=0.1
+    th=0.25
+    tv=0.10
     # h, w = orig.shape[:2];
     flags = [];
     segments = [];
-    h1 = [[0, 1.0],[0, th]];       # 0
-    h2 = [[0, 1.0],[0.5-th/2, 0.5+th/2]];   # 1
-    h3 = [[0, 1.0],[1.0-th, 1.0]];     # 2
-    vl1 = [[0, tv],[0, 0.5]];      # 3 # upper-left
-    vl2 = [[0, tv],[0.5, 1.0]];    # 4
-    vr1 = [[1.0-tv, 1.0],[0, 0.5]];    # 5 # upper-right
-    vr2 = [[1.0-tv, 1.0], [0.5, 1.0]]; # 6
+    # define rectangels in x,y w,h format
+    h1 = [0,0,1,tv];       # 0
+    h2 = [0,0.5-tv/2,1,tv];   # 1
+    h3 = [0,1-tv,1,tv];     # 2
+    vl1 = [0,0,th,0.5];      # 3 # upper-left
+    vl2 = [0,0.5,th,0.5];    # 4
+    vr1 = [1-th,0,th,0.5];    # 5 # upper-right
+    vr2 = [1-th,0.5,th,0.5];  # 6
     segments.append(h1);
     segments.append(h2);
     segments.append(h3);
@@ -49,25 +56,27 @@ def readseg(slice):
     segments.append(vr2);
 
     for a,seg in enumerate(segments):
-        xl, xh = seg[0];
-        yl, yh = seg[1];
-
-        # convert to pix coords
-        xl = int(xl * w);
-        xh = int(xh * w);
-        yl = int(yl * h);
-        yh = int(yh * h);
-        sw = xh - xl;
-        sh = yh - yl;
+        x,y,wd,ht=seg
+        x=int(x*w)
+        y=int(y*h)
+        wd=int(wd*w)
+        ht=int(ht*h)
 
         # check
-        count = np.count_nonzero(eroded[yl:yh, xl:xh] < 200);
-        area=sh*sw
-        print(count,area, round(count/area*100))
+        part=crop(cropped, [(x,y),(x+wd,y+ht)])
+        print('--------------')
+        print(a)
+        print('---------------')
+        print(part)
+        print('part sixe',part.shape)
+        count = np.count_nonzero(part==0);
+        area=wd*ht
+        print('count, area, coverage',count,area, round(count/area*100))
         if count / area > 0.1: # 0.5 is a sensitivity measure
             flags.append(a);
-        cv.rectangle(disp, (xl, yl), (xh, yh), (0, 0,255), -1)
-    cv.imshow('letter',disp)
+        cv.rectangle(cropped, (x,y), (x+wd, y+ht), (0, 0,255), 1)
+    print('disp',disp.shape)
+    cv.imshow('letter',eroded)
     # # print(flags)
     # if flags == [0,2,3,4,5,6]:
     #     return 0;
