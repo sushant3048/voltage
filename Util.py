@@ -6,11 +6,10 @@ def capture():
     _,img = cap.read()
     return img
 
+def crop(img, bounds):
+    # bounds is crop rectangle
+    (x1, y1), (x2, y2) = bounds
+    cropped = img[y1:y2, x1:x2]
+    return cropped
 
-def pyread1(frame):
-    text = pytesseract.image_to_string(frame, config='--psm 6 digits')
-    return text
 
-def pyread2(frame):
-    text = pytesseract.image_to_string(frame)
-    return text
