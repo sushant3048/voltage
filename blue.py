@@ -11,7 +11,7 @@ while(1):
     	
     (thresh, black) = cv.threshold(gray, 90, 255, cv.THRESH_BINARY)
     text = pytesseract.image_to_string(black)
-    print(text)
+    print('>'+text)
     # define range of blue color in HSV
     # lower_blue = np.array([110,50,50])
     # upper_blue = np.array([130,255,255])

@@ -1,50 +1,19 @@
-from Util import capture, pyread1, pyread2
-import cv2
 import numpy as np
+import cv2
+lowest= np.uint8([[[238,142,1 ]]])
+highest= np.uint8([[[249,190,20 ]]])
+lowest_hsv = cv2.cvtColor(lowest,cv2.COLOR_BGR2HSV)
+highest_hsv = cv2.cvtColor(highest,cv2.COLOR_BGR2HSV)
 
-while(1):
-    img=capture()
-    
-    # lab
-    lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB);
-    l,a,b = cv2.split(lab);
+print(lowest_hsv,highest_hsv)
 
-    # show
-    cv2.imshow("orig", img);
-
-    # threshold params
-    low = 105;
-    high = 255;
-    iters = 3;
-
-    # make copy
-    copy = b.copy();
-
-    # threshold
-    thresh = cv2.inRange(copy, low, high);
-    kernel = np.ones((5,5), np.uint8);
-    # dilate
-    for a in range(iters):
-        thresh = cv2.dilate(thresh, kernel);
-
-    # erode
-    for a in range(iters):
-        thresh = cv2.erode(thresh, kernel);
-
-    # show image
-    cv2.imshow("thresh", thresh);
-    # cv2.imwrite("threshold.jpg", thresh);
-
-    # start processing
-    # _, contours, _ = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE);
-    k = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE);
-    contours=k[0]
-
-    # draw
-    for contour in contours:
-        cv2.drawContours(img, [contour], 0, (0,255,0), 3);
-    
-    cv2.imshow("contour", img);
-
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        break
+# rgb(8,166,244)
+# rgb(22,181,247)
+# rgb(8,176,249)
+# rgb(3,158,248)
+# rgb(3,147,246)
+# rgb(3,142,245)
+# rgb(1,144,248)
+# rgb(3,155,248)
+# rgb(67,190,247)
+# rgb(7,173,238)

@@ -27,10 +27,11 @@ class Segments:
 
         # check res to see if it's a one
         h, w = number.shape[:2];
-        if w < 0.5 * h:
-            self.flags.append(5);
-            self.flags.append(6);
-            return;
+        print(h,w)
+        # if w < 0.5 * h:
+        #     self.flags.append(5);
+        #     self.flags.append(6);
+        #     return;
 
         # check for segments
         for a in range(len(self.segments)):
