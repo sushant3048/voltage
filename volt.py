@@ -4,7 +4,7 @@ from Util import crop
 from segments import readseg
 
 cap = cv.VideoCapture(0)
-
+prev="000"
 while True:
     _,inp = cap.read()
     hsv = cv.cvtColor(inp, cv.COLOR_BGR2HSV)
@@ -26,10 +26,10 @@ while True:
         x, y, w, h = cv.boundingRect(max_contour)
 
         # tightening the rectangle with experimental values
-        x = int(x+w*0.07)
+        x = int(x+w*0.08)
         w = int(w*0.85)
-        y = int(y+h*0.05)
-        h = int(h*0.90)
+        y = int(y+h*0.08)
+        h = int(h*0.85)
 
         cropped = crop(inp, [(x, y), (x+w, y+h)])
 
@@ -57,11 +57,16 @@ while True:
         seg1 = crop(inp, r1)
         seg2 = crop(inp, r2)
         seg3 = crop(inp, r3)
-        # d1=readseg(seg1)
-        # d2=readseg(seg2)
-        # d3=readseg(seg3)
-        # print('>',d1+d2+d3)
-        print(readseg(seg3))
+        d1=readseg(seg1,'first')
+        d2=readseg(seg2,'second')
+        d3=readseg(seg3,'third')
+        try:
+            val=""+d1+d2+d3
+            prev=val
+        except:
+            val=prev
+
+        print(val)
         if cv.waitKey(1) == ord('q'):
             break
 
