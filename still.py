@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 # import pytesseract as pyt
-from Util import *
+from util import *
 from segments import readseg
 # import matplotlib.pyplot as plt
 

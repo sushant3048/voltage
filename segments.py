@@ -1,7 +1,7 @@
 import cv2 as cv
 import numpy as np
 # import pytesseract as pyt
-from Util import crop
+from util import crop
 
 
 def readseg(inp,id):
@@ -48,8 +48,8 @@ def readseg(inp,id):
         # cv.rectangle(slice,(x,y),(x+w,y+h),(0,0,255),1)
         # cv.imshow('Detected contours', slice)
 
-        # eroded=crop(eroded,[(x,y),[x+w,y+h]])
-        # disp=crop(disp,[(x,y),[x+w,y+h]])
+        # eroded=crop(eroded,[x,y,w,h])
+        # disp=crop(disp,[x,y,w,h])
 
 
         # Digit detection ////////////////////////
@@ -82,7 +82,7 @@ def readseg(inp,id):
             ht=int(ht*h)
 
             # check
-            part=crop(eroded, [(x,y),(x+wd,y+ht)])
+            part=crop(eroded, [x,y,wd,ht])
             count = np.count_nonzero(part==0);
             area=wd*ht
             # print('count, area, coverage',count,area, round(count/area*100))

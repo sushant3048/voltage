@@ -6,10 +6,12 @@ def capture():
     _,img = cap.read()
     return img
 
-def crop(img, bounds):
+def crop(img, rec):
     # bounds is crop rectangle
-    (x1, y1), (x2, y2) = bounds
-    cropped = img[y1:y2, x1:x2]
+    x,y,w,h=rec
+    cropped = img[y:y+h, x:x+w]
     return cropped
 
 
+img=capture()
+print(img.shape)
